@@ -29,7 +29,7 @@ def wheeler_L(N, r_mm, pitch_mm):
     return (r * r * N * N) / (9 * r + 10 * ell)
 
 
-def derived(L_uH, winding_d, wire_cu_d, wire_od, wall, flange_len, flange_over_wire):
+def derived(L_uH, winding_d, wire_cu_d, wire_od, wall, flange_len, flange_over_wire, lead_d=1.5, spare_turns=1):
     od = wire_od_eff(wire_cu_d, wire_od)
     inner_d = winding_d - 2 * wall
     pitch = od
@@ -41,11 +41,10 @@ def derived(L_uH, winding_d, wire_cu_d, wire_od, wall, flange_len, flange_over_w
         N_exact = float("nan")
         finite = False
     N = max(1, round(N_exact)) if finite else 0
-    winding_len = N * pitch
+    winding_len = (N + spare_turns) * pitch
     length = winding_len + 2 * flange_len
     flange_od = winding_d + 2 * (od + flange_over_wire)
-    lead_d = 2 * od
-    ok = inner_d > 0 and finite and winding_len > 0
+    ok = inner_d > 0 and finite and winding_len > 0 and spare_turns >= 0
     L_actual = wheeler_L(N, r_mm, pitch) if ok else float("nan")
     remaining = winding_len - 2 * lead_d - 2
     use_mid_leads = remaining < lead_d

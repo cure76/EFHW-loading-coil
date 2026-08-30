@@ -11,6 +11,8 @@ wall = 2;
 flange_len = 14.5;
 flange_over_wire = 0.5;
 m4_d = 4.5;
+lead_d = 1.5; // отверстие под отвод ПЭТВ-2
+spare_turns = 1; // запас окна намотки (витков)
 
 /* [Preview] */
 show_winding = false;
@@ -45,13 +47,12 @@ r_mm = (winding_d + od) / 2;
 N_exact = wheeler_n(L_uH, r_mm, pitch);
 N_finite = N_exact == N_exact && N_exact > 0 && N_exact < 1e6;
 N = N_finite ? max(1, round(N_exact)) : 0;
-winding_len = N * pitch;
+winding_len = (N + spare_turns) * pitch;
 length = winding_len + 2 * flange_len;
 flange_od = winding_d + 2 * (od + flange_over_wire);
-lead_d = 2 * od;
 L_actual = N_finite ? wheeler_L(N, r_mm, pitch) : 0;
 use_mid_leads = (winding_len - 2 * lead_d - 2) < lead_d;
-geometry_ok = inner_d > 0 && N_finite && winding_len > 0;
+geometry_ok = inner_d > 0 && N_finite && winding_len > 0 && spare_turns >= 0;
 
 function lead_z(sign) =
     use_mid_leads
@@ -104,9 +105,9 @@ module echo_recipe() {
         echo("ОШИБКА: неверные параметры (стенка, L или провод). Геометрию не строим.");
         echo("inner_d=", inner_d, " N_exact=", N_exact, " winding_len=", winding_len);
     } else {
-        echo("Витки N=", N, " (точно ", N_exact, ")");
-        echo("Окно намотки мм=", winding_len);
-        echo("L факт мкГн=", L_actual);
+        echo("Витки N=", N, " (точно ", N_exact, "), резерв=", spare_turns);
+        echo("Окно намотки мм=", winding_len, " (N + резерв)");
+        echo("L факт мкГн=", L_actual, " (для N витков; лишний виток снять при подстройке)");
         echo("Длина каркаса мм=", length);
         echo("Ø буртика мм=", flange_od);
         echo("Ø канала мм=", inner_d);
