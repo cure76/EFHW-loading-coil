@@ -3,4 +3,6 @@
 __pycache__/
 *.pyc
 *.stl
+!EFHW_Loading_Coil_100_mkgn_1mm.stl
+!EFHW_terminal_saddle_M4.stl
 *.png
