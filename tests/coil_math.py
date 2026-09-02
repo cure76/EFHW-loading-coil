@@ -29,6 +29,12 @@ def wheeler_L(N, r_mm, pitch_mm):
     return (r * r * N * N) / (9 * r + 10 * ell)
 
 
+def rib_chord_w(inner_d, rib_t):
+    r = inner_d / 2
+    disc = r * r - (r - rib_t) ** 2
+    return 2 * disc ** 0.5 if disc > 0 and rib_t > 0 else 0.0
+
+
 def derived(
     L_uH,
     winding_d,
@@ -39,9 +45,8 @@ def derived(
     flange_over_wire,
     lead_d=1.5,
     spare_turns=1,
-    m4_d=4.5,
-    rib_w=12,
-    rib_t=3,
+    m4_d=4.4,
+    rib_t=1,
 ):
     od = wire_od_eff(wire_cu_d, wire_od)
     inner_d = winding_d - 2 * wall
@@ -57,8 +62,9 @@ def derived(
     winding_len = (N + spare_turns) * pitch
     length = winding_len + 2 * flange_len
     flange_od = winding_d + 2 * (od + flange_over_wire)
+    rib_w = rib_chord_w(inner_d, rib_t)
     channel_after_rib = inner_d - rib_t
-    rib_ok = rib_w > m4_d and rib_t > 0 and rib_w < inner_d and rib_t < inner_d / 2
+    rib_ok = rib_t > 0 and rib_t < inner_d / 2 and rib_w > m4_d
     ok = inner_d > 0 and finite and winding_len > 0 and spare_turns >= 0 and rib_ok
     L_actual = wheeler_L(N, r_mm, pitch) if ok else float("nan")
     remaining = winding_len - 2 * lead_d - 2
