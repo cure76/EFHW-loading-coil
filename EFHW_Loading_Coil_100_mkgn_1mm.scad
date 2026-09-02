@@ -13,6 +13,8 @@ flange_over_wire = 0.5;
 m4_d = 4.5;
 lead_d = 1.5; // отверстие под отвод ПЭТВ-2
 spare_turns = 1; // запас окна намотки (витков)
+rib_w = 12; // внутренняя полка под шайбы, мм
+rib_t = 3; // полка внутрь канала, мм
 
 /* [Preview] */
 show_winding = false;
@@ -52,7 +54,8 @@ length = winding_len + 2 * flange_len;
 flange_od = winding_d + 2 * (od + flange_over_wire);
 L_actual = N_finite ? wheeler_L(N, r_mm, pitch) : 0;
 use_mid_leads = (winding_len - 2 * lead_d - 2) < lead_d;
-geometry_ok = inner_d > 0 && N_finite && winding_len > 0 && spare_turns >= 0;
+rib_ok = rib_w > m4_d && rib_t > 0 && rib_w < inner_d && rib_t < inner_d / 2;
+geometry_ok = inner_d > 0 && N_finite && winding_len > 0 && spare_turns >= 0 && rib_ok;
 
 function lead_z(sign) =
     use_mid_leads
@@ -63,6 +66,11 @@ module radial_cut(d, z) {
     translate([0, 0, z])
         rotate([90, 0, 0])
             cylinder(h = flange_od / 2 + 5, d = d, center = false);
+}
+
+module inner_rib() {
+    translate([0, -inner_d / 2 + rib_t / 2, 0])
+        cube([rib_w, rib_t, length], center = true);
 }
 
 module former() {
@@ -78,6 +86,7 @@ module former() {
                         cylinder(h = flange_len, d = flange_od, center = true);
                         cylinder(h = flange_len + 1, d = winding_d, center = true);
                     }
+            inner_rib();
         }
         for (sign = [-1, 1]) {
             radial_cut(m4_d, sign * (length / 2 - flange_len / 2));
@@ -112,6 +121,7 @@ module echo_recipe() {
         echo("Ø буртика мм=", flange_od);
         echo("Ø канала мм=", inner_d);
         echo("Ø отвода мм=", lead_d, " Ø М4 мм=", m4_d);
+        echo("Полка внутри: ширина мм=", rib_w, " толщина мм=", rib_t, " (отверстия сквозные через полку)");
         echo("Мин. внутр. Ø термоусадки до усадки мм=", flange_od + 2);
         echo("Сборка: лак → отводы на М4 (гайка в канале) → усадка на всю катушку, болты снаружи");
         if (lead_d >= flange_od / 2)

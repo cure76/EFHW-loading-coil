@@ -20,6 +20,10 @@ class TestCoilMath(unittest.TestCase):
         self.assertAlmostEqual(d["inner_d"], 51.0, places=3)
         self.assertAlmostEqual(d["lead_d"], 1.5, places=3)
         self.assertAlmostEqual(d["shrink_id_min"], 60.186, places=3)
+        self.assertAlmostEqual(d["rib_w"], 12.0, places=3)
+        self.assertAlmostEqual(d["rib_t"], 3.0, places=3)
+        self.assertGreater(d["rib_w"], d["m4_d"])
+        self.assertAlmostEqual(d["channel_after_rib"], 48.0, places=3)
         self.assertTrue(d["ok"])
 
     def test_L50_fewer_turns(self):
@@ -35,6 +39,10 @@ class TestCoilMath(unittest.TestCase):
 
     def test_bad_wall(self):
         d = derived(100, 55, 1.0, 0, 30, 14.5, 0.5)
+        self.assertFalse(d["ok"])
+
+    def test_rib_too_thick(self):
+        d = derived(100, 55, 1.0, 0, 2, 14.5, 0.5, rib_w=12, rib_t=30)
         self.assertFalse(d["ok"])
 
 

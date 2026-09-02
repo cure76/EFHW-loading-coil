@@ -29,7 +29,20 @@ def wheeler_L(N, r_mm, pitch_mm):
     return (r * r * N * N) / (9 * r + 10 * ell)
 
 
-def derived(L_uH, winding_d, wire_cu_d, wire_od, wall, flange_len, flange_over_wire, lead_d=1.5, spare_turns=1):
+def derived(
+    L_uH,
+    winding_d,
+    wire_cu_d,
+    wire_od,
+    wall,
+    flange_len,
+    flange_over_wire,
+    lead_d=1.5,
+    spare_turns=1,
+    m4_d=4.5,
+    rib_w=12,
+    rib_t=3,
+):
     od = wire_od_eff(wire_cu_d, wire_od)
     inner_d = winding_d - 2 * wall
     pitch = od
@@ -44,7 +57,9 @@ def derived(L_uH, winding_d, wire_cu_d, wire_od, wall, flange_len, flange_over_w
     winding_len = (N + spare_turns) * pitch
     length = winding_len + 2 * flange_len
     flange_od = winding_d + 2 * (od + flange_over_wire)
-    ok = inner_d > 0 and finite and winding_len > 0 and spare_turns >= 0
+    channel_after_rib = inner_d - rib_t
+    rib_ok = rib_w > m4_d and rib_t > 0 and rib_w < inner_d and rib_t < inner_d / 2
+    ok = inner_d > 0 and finite and winding_len > 0 and spare_turns >= 0 and rib_ok
     L_actual = wheeler_L(N, r_mm, pitch) if ok else float("nan")
     remaining = winding_len - 2 * lead_d - 2
     use_mid_leads = remaining < lead_d
@@ -59,6 +74,10 @@ def derived(L_uH, winding_d, wire_cu_d, wire_od, wall, flange_len, flange_over_w
         "length": length,
         "flange_od": flange_od,
         "lead_d": lead_d,
+        "m4_d": m4_d,
+        "rib_w": rib_w,
+        "rib_t": rib_t,
+        "channel_after_rib": channel_after_rib,
         "L_actual": L_actual,
         "shrink_id_min": flange_od + 2,
         "use_mid_leads": use_mid_leads,
