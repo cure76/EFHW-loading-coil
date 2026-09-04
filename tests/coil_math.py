@@ -47,6 +47,7 @@ def derived(
     spare_turns=1,
     m4_d=4.4,
     rib_t=1,
+    lead_flange_gap=0.3,
 ):
     od = wire_od_eff(wire_cu_d, wire_od)
     inner_d = winding_d - 2 * wall
@@ -67,8 +68,9 @@ def derived(
     rib_ok = rib_t > 0 and rib_t < inner_d / 2 and rib_w > m4_d
     ok = inner_d > 0 and finite and winding_len > 0 and spare_turns >= 0 and rib_ok
     L_actual = wheeler_L(N, r_mm, pitch) if ok else float("nan")
-    remaining = winding_len - 2 * lead_d - 2
+    remaining = winding_len - 2 * lead_d - 2 * lead_flange_gap
     use_mid_leads = remaining < lead_d
+    lead_z = (winding_len / 4) if use_mid_leads else (winding_len / 2 - lead_d / 2 - lead_flange_gap)
     return {
         "od": od,
         "inner_d": inner_d,
@@ -87,5 +89,7 @@ def derived(
         "L_actual": L_actual,
         "shrink_id_min": flange_od + 2,
         "use_mid_leads": use_mid_leads,
+        "lead_flange_gap": lead_flange_gap,
+        "lead_z": lead_z,
         "ok": ok,
     }

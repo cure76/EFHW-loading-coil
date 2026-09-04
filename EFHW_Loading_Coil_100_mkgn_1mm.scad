@@ -12,6 +12,7 @@ flange_len = 14.5;
 flange_over_wire = 0.5;
 m4_d = 4.4;
 lead_d = 1.5; // отверстие под отвод ПЭТВ-2
+lead_flange_gap = 0.3; // зазор от края отверстия до буртика, мм
 spare_turns = 1; // запас окна намотки (витков)
 rib_t = 1; // полка внутрь канала, мм (хорда до стенок цилиндра)
 
@@ -52,7 +53,7 @@ winding_len = (N + spare_turns) * pitch;
 length = winding_len + 2 * flange_len;
 flange_od = winding_d + 2 * (od + flange_over_wire);
 L_actual = N_finite ? wheeler_L(N, r_mm, pitch) : 0;
-use_mid_leads = (winding_len - 2 * lead_d - 2) < lead_d;
+use_mid_leads = (winding_len - 2 * lead_d - 2 * lead_flange_gap) < lead_d;
 rib_w = (rib_t > 0 && rib_t < inner_d / 2)
     ? 2 * sqrt(pow(inner_d / 2, 2) - pow(inner_d / 2 - rib_t, 2))
     : 0;
@@ -62,7 +63,7 @@ geometry_ok = inner_d > 0 && N_finite && winding_len > 0 && spare_turns >= 0 && 
 function lead_z(sign) =
     use_mid_leads
         ? sign * winding_len / 4
-        : sign * (winding_len / 2 - lead_d / 2 - 1);
+        : sign * (winding_len / 2 - lead_d / 2 - lead_flange_gap);
 
 module radial_cut(d, z) {
     translate([0, 0, z])
@@ -125,7 +126,7 @@ module echo_recipe() {
         echo("Длина каркаса мм=", length);
         echo("Ø буртика мм=", flange_od);
         echo("Ø канала мм=", inner_d);
-        echo("Ø отвода мм=", lead_d, " Ø М4 мм=", m4_d);
+        echo("Ø отвода мм=", lead_d, " зазор до буртика мм=", lead_flange_gap, " Ø М4 мм=", m4_d);
         echo("Полка внутри: толщина мм=", rib_t, " ширина хорды мм=", rib_w, " (сливается со стенкой, отверстия сквозные)");
         echo("Мин. внутр. Ø термоусадки до усадки мм=", flange_od + 2);
         echo("Сборка: лак → отводы на М4 (гайка в канале) → усадка на всю катушку, болты снаружи");

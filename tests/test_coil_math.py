@@ -25,6 +25,9 @@ class TestCoilMath(unittest.TestCase):
         self.assertAlmostEqual(d["rib_w"], 14.142, places=3)
         self.assertGreater(d["rib_w"], d["m4_d"])
         self.assertAlmostEqual(d["channel_after_rib"], 50.0, places=3)
+        self.assertAlmostEqual(d["lead_flange_gap"], 0.3, places=3)
+        self.assertFalse(d["use_mid_leads"])
+        self.assertAlmostEqual(d["lead_z"], 27.368, places=3)
         self.assertTrue(d["ok"])
 
     def test_L50_fewer_turns(self):
