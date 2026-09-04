@@ -44,7 +44,7 @@ def derived(
     flange_len,
     flange_over_wire,
     lead_d=1.5,
-    spare_turns=1,
+    spare_turns=8,
     m4_d=4.4,
     rib_t=1,
     lead_flange_gap=0.3,

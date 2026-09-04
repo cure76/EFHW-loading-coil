@@ -13,10 +13,10 @@ class TestCoilMath(unittest.TestCase):
         d = derived(100, 55, 1.0, 0, 2, 14.5, 0.5)
         self.assertEqual(d["N"], 51)
         self.assertAlmostEqual(d["N_exact"], 51.21, places=2)
-        self.assertAlmostEqual(d["winding_len"], 56.836, places=3)
+        self.assertAlmostEqual(d["winding_len"], 64.487, places=3)
         self.assertAlmostEqual(d["L_actual"], 99.46, places=2)
         self.assertAlmostEqual(d["flange_od"], 58.186, places=3)
-        self.assertAlmostEqual(d["length"], 85.836, places=3)
+        self.assertAlmostEqual(d["length"], 93.487, places=3)
         self.assertAlmostEqual(d["inner_d"], 51.0, places=3)
         self.assertAlmostEqual(d["lead_d"], 1.5, places=3)
         self.assertAlmostEqual(d["m4_d"], 4.4, places=3)
@@ -27,13 +27,13 @@ class TestCoilMath(unittest.TestCase):
         self.assertAlmostEqual(d["channel_after_rib"], 50.0, places=3)
         self.assertAlmostEqual(d["lead_flange_gap"], 0.3, places=3)
         self.assertFalse(d["use_mid_leads"])
-        self.assertAlmostEqual(d["lead_z"], 27.368, places=3)
+        self.assertAlmostEqual(d["lead_z"], 31.193, places=3)
         self.assertTrue(d["ok"])
 
     def test_L50_fewer_turns(self):
         d = derived(50, 55, 1.0, 0, 2, 14.5, 0.5)
         self.assertEqual(d["N"], 31)
-        self.assertLess(d["length"], 85.836)
+        self.assertLess(d["length"], 93.487)
 
     def test_measured_wire_od(self):
         d = derived(100, 55, 1.0, 1.12, 2, 14.5, 0.5)
